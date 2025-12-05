@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bengkel Motor Jaya</title>
+    <link rel="stylesheet" href="bengkel.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f5f7fa; font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; }
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        .admin-sidebar {
+            width: 260px;
+            background: #1B3C53;
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .admin-logo {
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .admin-nav-item {
+            padding: 1rem 1.5rem;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+        }
+        .admin-nav-item:hover,
+        .admin-nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: #ffd166;
+        }
+        .admin-nav-item .icon {
+            margin-right: 0.8rem;
+            font-size: 1.1rem;
+        }
+        .admin-content {
+            margin-left: 260px;
+            padding: 2rem;
+            flex: 1;
+        }
+        .admin-top-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .admin-top-bar h1 {
+            color: #1B3C53;
+            font-size: 1.8rem;
+        }
+        .admin-logout-btn {
+            padding: 0.6rem 1.5rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .admin-logout-btn:hover {
+            background: #c0392b;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-top: 4px solid #234C6A;
+        }
+        .stat-box.warning { border-top-color: #f39c12; }
+        .stat-box.success { border-top-color: #27ae60; }
+        .stat-box.danger { border-top-color: #e74c3c; }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #234C6A;
+            margin-bottom: 0.5rem;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+        }
+        .admin-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .admin-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #1B3C53;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .admin-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e8e8e8;
+            color: #333;
+        }
+        .admin-table tr:hover {
+            background: #f9f9f9;
+        }
+        .admin-btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .admin-btn-primary {
+            background: #234C6A;
+            color: white;
+        }
+        .admin-btn-primary:hover {
+            background: #1B3C53;
+            transform: translateY(-2px);
+        }
+        .admin-btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            margin: 0 0.25rem;
+        }
+        .admin-btn-edit {
+            background: #3498db;
+            color: white;
+        }
+        .admin-btn-edit:hover {
+            background: #2980b9;
+        }
+        .admin-btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+        .admin-btn-delete:hover {
+            background: #c0392b;
+        }
+        .admin-btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        .admin-btn-success:hover {
+            background: #229954;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-confirm { background: #d1ecf1; color: #0c5460; }
+        .badge-done { background: #d4edda; color: #155724; }
+        .badge-rejected { background: #f8d7da; color: #721c24; }
+        .badge-custom { background: #ffeaa7; color: #d63031; }
+        .badge-active { background: #d4edda; color: #155724; }
+        .admin-tab-content {
+            display: none;
+        }
+        .admin-tab-content.active {
+            display: block;
+        }
+        .admin-form {
+            display: grid;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #1B3C53;
+            margin-bottom: 0.5rem;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #234C6A;
+            box-shadow: 0 0 0 3px rgba(35, 76, 106, 0.1);
+        }
+        .admin-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .admin-modal.show {
+            display: flex;
+        }
+        .admin-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .admin-modal-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1B3C53;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-modal-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        .admin-modal-close:hover {
+            color: #333;
+        }
+        .admin-search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .admin-search-bar input,
+        .admin-search-bar select {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .admin-search-bar input {
+            flex: 1;
+            min-width: 250px;
+        }
+        .admin-alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .admin-alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .admin-alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 1rem 0;
+            }
+            .admin-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            .admin-nav {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">🔧 Admin Panel</div>
+            <nav class="admin-nav">
+                <div class="admin-nav-item active" onclick="switchTab('dashboard')">
+                    <span class="icon">📊</span> Dashboard
+                </div>
+                <div class="admin-nav-item" onclick="switchTab('bookings')">
+                    <span class="icon">📋</span> Booking
+                </div>
+                <div class="admin-nav-item" onclick="switchTab('services')">
+                    <span class="icon">🛠️</span> Layanan
+                </div>
+                <div class="admin-nav-item" onclick="switchTab('users')">
+                    <span class="icon">👥</span> User
+                </div>
+                <div class="admin-nav-item" onclick="switchTab('rewards')">
+                    <span class="icon">🎁</span> Reward
+                </div>
+            </nav>
+        </aside>
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Top Bar -->
+            <div class="admin-top-bar">
+                <h1 id="pageTitle">📊 Dashboard</h1>
+                <button class="admin-logout-btn" onclick="adminLogout()">Logout</button>
+            </div>
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="admin-tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number" id="statTotalUsers">-</div>
+                        <div class="stat-label">Total User</div>
+                    </div>
+                    <div class="stat-box warning">
+                        <div class="stat-number" id="statPendingBookings">-</div>
+                        <div class="stat-label">Booking Pending</div>
+                    </div>
+                    <div class="stat-box success">
+                        <div class="stat-number" id="statDoneBookings">-</div>
+                        <div class="stat-label">Booking Selesai</div>
+                    </div>
+                    <div class="stat-box danger">
+                        <div class="stat-number" id="statTotalServices">-</div>
+                        <div class="stat-label">Total Layanan</div>
+                    </div>
+                </div>
+                <h2 style="color: #1B3C53; margin: 2rem 0 1rem 0;">Booking Terbaru</h2>
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Pelanggan</th>
+                                <th>Layanan</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboardBookingsList">
+                            <tr><td colspan="5" style="text-align: center; color: #999;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Bookings Tab -->
+            <div id="bookings" class="admin-tab-content">
+                <div class="admin-search-bar">
+                    <input type="text" id="bookingFilterName" placeholder="Cari nama pelanggan..." onkeyup="loadBookings()">
+                    <select id="bookingFilterStatus" onchange="loadBookings()">
+                        <option value="">Semua Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirm">Confirm</option>
+                        <option value="done">Done</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div id="bookingAlert"></div>
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Pelanggan</th>
+                                <th>No. HP</th>
+                                <th>Layanan</th>
+                                <th>Poin</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingsList">
+                            <tr><td colspan="8" style="text-align: center; color: #999;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Services Tab -->
+            <div id="services" class="admin-tab-content">
+                <button class="admin-btn admin-btn-primary" onclick="openAddServiceModal()" style="margin-bottom: 1.5rem;">+ Tambah Layanan</button>
+                <div id="serviceAlert"></div>
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Layanan</th>
+                                <th>Harga</th>
+                                <th>Poin</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servicesList">
+                            <tr><td colspan="5" style="text-align: center; color: #999;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Users Tab -->
+            <div id="users" class="admin-tab-content">
+                <div class="admin-search-bar">
+                    <input type="text" id="userFilterName" placeholder="Cari nama atau email..." onkeyup="loadUsers()">
+                </div>
+                <div id="userAlert"></div>
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>No. HP</th>
+                                <th>Booking</th>
+                                <th>Poin</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList">
+                            <tr><td colspan="7" style="text-align: center; color: #999;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Rewards Tab -->
+            <div id="rewards" class="admin-tab-content">
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Reward</th>
+                                <th>Poin Dipakai</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rewardsList">
+                            <tr><td colspan="5" style="text-align: center; color: #999;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Modal: Edit Booking Status -->
+    <div id="editStatusModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                Edit Status Booking
+                <span class="admin-modal-close" onclick="closeEditStatusModal()">✕</span>
+            </div>
+            <form onsubmit="saveBookingStatus(event)" class="admin-form">
+                <div class="form-group">
+                    <label>Booking ID</label>
+                    <input type="text" id="editStatusBookingId" readonly style="background: #f5f5f5;">
+                </div>
+                <div class="form-group">
+                    <label>Status Booking</label>
+                    <select id="editStatusValue" required>
+                        <option value="pending">Pending</option>
+                        <option value="confirm">Confirm</option>
+                        <option value="done">Done</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="admin-btn admin-btn-primary" style="flex: 1;">Simpan</button>
+                    <button type="button" class="admin-btn" style="flex: 1; background: #999; color: white;" onclick="closeEditStatusModal()">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal: Add/Edit Service -->
+    <div id="serviceModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <span id="serviceModalTitle">Tambah Layanan</span>
+                <span class="admin-modal-close" onclick="closeServiceModal()">✕</span>
+            </div>
+            <form onsubmit="saveService(event)" class="admin-form">
+                <input type="hidden" id="serviceId">
+                <div class="form-group">
+                    <label>Nama Layanan</label>
+                    <input type="text" id="serviceName" required placeholder="Contoh: Service Rutin">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Harga (Rp)</label>
+                        <input type="number" id="servicePrice" required min="0" placeholder="500000">
+                    </div>
+                    <div class="form-group">
+                        <label>Poin</label>
+                        <input type="number" id="servicePoints" required min="0" placeholder="10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <textarea id="serviceDesc" placeholder="Deskripsi layanan..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="admin-btn admin-btn-primary" style="flex: 1;">Simpan</button>
+                    <button type="button" class="admin-btn" style="flex: 1; background: #999; color: white;" onclick="closeServiceModal()">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal: Konfirmasi Hapus Layanan -->
+    <div id="deleteServiceModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                Hapus Layanan
+                <span class="admin-modal-close" onclick="closeDeleteServiceModal()">✕</span>
+            </div>
+            <p style="color: #333; margin-bottom: 1.5rem; font-size: 0.95rem;">Apakah Anda yakin ingin menghapus layanan <strong id="deleteServiceName"></strong>?</p>
+            <p style="color: #999; font-size: 0.85rem; margin-bottom: 1.5rem;">Tindakan ini tidak dapat dibatalkan.</p>
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="confirmDeleteService()" class="admin-btn admin-btn-delete" style="flex: 1;">Hapus</button>
+                <button onclick="closeDeleteServiceModal()" class="admin-btn" style="flex: 1; background: #999; color: white;">Batal</button>
+            </div>
+        </div>
+    </div>
+    <script src="admin.js"></script>
+</body>
+</html>

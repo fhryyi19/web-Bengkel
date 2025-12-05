@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bengkel Mobil Bandung</title>
+    <link rel="stylesheet" href="bengkel.css">
+</head>
+<body>
+    
+    <header>
+        <div class="container">
+            <div class="logo">
+                <span>Bengkel Mobil Bandung</span>
+                <div id="userProfileArea" style="display: none; position: relative;">
+                    <img id="userAvatar" class="user-avatar" src="images/user.png" alt="User" onclick="toggleUserMenu()">
+                    <div id="userMenu" class="user-menu" style="display: none;">
+                        <div class="user-menu-item" id="userName"></div>
+                        <hr>
+                        <button onclick="logout()" class="user-menu-btn">Logout</button>
+                    </div>
+                </div>
+                <div id="guestArea" style="display: none;">
+                    <img src="images/user.png" class="user-avatar" onclick="openLoginPopup()" alt="Login">
+                </div>
+            </div>
+            <div class="user-points">
+                <span class="points-badge">⭐ <span id="totalPoints">0</span> Poin</span>
+            </div>
+        </div>
+    </header>
+    
+    <section id="home" class="hero" style="background-image: url('images/bengkelmobil.png'); background-size: cover; background-position: center;">
+        <div class="container">
+            <h1 class="hero-title">Selamat Datang di Bengkel Mobil Bandung</h1>
+            <p class="hero-subtitle">Service berkualitas dengan berbagai hadiah menarik!</p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="handleBookingClick()">Booking Sekarang</button>
+            </div>
+        </div>
+    </section>
+   \
+    <section id="services" class="section">
+        <div class="container">
+            <h2 class="section-title">Layanan Terbaik Kami</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="images/service.jpg" alt="Service Rutin" class="service-img">
+                    </div>
+                    <h3>Service Rutin</h3>
+                    <p>Ganti oli, tune up, dan pemeriksaan berkala</p>
+                    <div class="price">Rp 500.000</div>
+                    <div class="points-earn">+10 Poin</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="images/mesin.jpg" alt="Perbaikan Mesin" class="service-img">
+                    </div>
+                    <h3>Perbaikan Mesin</h3>
+                    <p>Service mesin dan komponen dalam</p>
+                    <div class="price">Rp 1.000.000</div>
+                    <div class="points-earn">+30 Poin</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <img src="images/gantiban.jpeg" alt="Ganti Ban & Rem" class="service-img">
+                    </div>
+                    <h3>Ganti Ban & Rem</h3>
+                    <p>Penggantian ban dan service sistem rem</p>
+                    <div class="price">Rp 350.000</div>
+                    <div class="points-earn">+20 Poin</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="booking" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">Booking Jadwal Service</h2>
+            <div class="booking-layout">
+                <div class="booking-form-column">
+                    <form id="bookingForm" class="booking-form">
+                        <div class="form-group">
+                            <label>Pilih Layanan</label>
+                            <select id="serviceSelect" required>
+                                <option value="">-- Pilih Layanan --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" id="customerName" required placeholder="Masukkan nama Anda">
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor HP</label>
+                            <input type="tel" id="customerPhone" required placeholder="08xxxxxxxxxx">
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Service</label>
+                            <input type="date" id="serviceDate" required>
+                        </div>
+                        <div id="serviceInfo" class="service-info">
+                            <div><strong>Harga:</strong> Rp <span id="servicePrice">0</span></div>
+                            <div><strong>Poin:</strong> <span id="servicePoints">0</span> 🎁</div>
+                        </div>
+                        
+                        <div id="customServiceFields" class="custom-service-fields" style="display: none; margin-top: 0.8rem;">
+                            <div class="form-group">
+                                <label>Beritahu kami apa yang rusak pada mobil anda</label>
+                                <input type="text" id="customServiceName" placeholder="Contoh: Ganti Kampas Rem Custom">
+                            </div>
+                            <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">Admin akan menentukan poin dan harga untuk layanan ini.</p>
+                        </div>
+                        <button type="submit" class="btn-primary">Booking</button>
+                    </form>
+                </div>
+                <div class="booking-list-column">
+                    <h3>Daftar Booking Anda</h3>
+                    <div id="bookingsList" class="bookings-container" aria-live="polite">
+                        <p class="empty-state">Belum ada booking</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="rewards" class="section">
+        <div class="container">
+            <h2 class="section-title">Total Poin dan Booking</h2>
+            <div class="rewards-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalBookings">0</div>
+                    <div class="stat-label">Total Booking</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPointsDisplay">0</div>
+                    <div class="stat-label">Total Poin</div>
+                </div>
+            </div>
+           
+            <div class="redeem-section">
+                <h3 class="redeem-title">Tukar Poin</h3>
+                <p class="redeem-sub">Pilih hadiah yang ingin ditukar menggunakan poin Anda.</p>
+                <div class="redeem-grid">
+                    <div class="redeem-card">
+                        <div class="redeem-thumb">
+                            <img src="images/voucher.jpg" alt="Voucher Diskon" onerror="this.src='images/reward-default.jpg'">
+                        </div>
+                        <div class="redeem-body">
+                            <h4>Voucher Diskon</h4>
+                            <div class="redeem-points">50 Poin</div>
+                            <button class="btn-redeem" onclick="redeemReward(50, 'Diskon 10%')">Tukar</button>
+                        </div>
+                    </div>
+                    <div class="redeem-card">
+                        <div class="redeem-thumb">
+                            <img src="images/olimobil.jpg" alt="Ganti Oli Gratis" onerror="this.src='images/reward-default.jpg'">
+                        </div>
+                        <div class="redeem-body">
+                            <h4>Ganti Oli Gratis</h4>
+                            <div class="redeem-points">100 Poin</div>
+                            <button class="btn-redeem" onclick="redeemReward(100, 'Ganti Oli Gratis')">Tukar</button>
+                        </div>
+                    </div>
+                    <div class="redeem-card">
+                        <div class="redeem-thumb">
+                            <img src="images/service.jpg" alt="Service Gratis" onerror="this.src='images/reward-default.jpg'">
+                        </div>
+                        <div class="redeem-body">
+                            <h4>Service Gratis</h4>
+                            <div class="redeem-points">300 Poin</div>
+                            <button class="btn-redeem" onclick="redeemReward(300, 'Service Premium')">Tukar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="sponsor" class="sponsor-section">
+        <div class="container">
+            <h2 class="sponsor-title">Sponsor & Partner</h2>
+            <div class="sponsor-logos">
+                <img src="images/honda.jpg" alt="Honda" class="sponsor-logo">
+                <img src="images/car.jpg" alt="Audi" class="sponsor-logo">
+                <img src="images/hyundai.jpg" alt="Hyundai" class="sponsor-logo">
+                <img src="images/bmw.jpg" alt="BMW" class="sponsor-logo">
+                <img src="images/mazda.jpg" alt="Mazda" class="sponsor-logo">
+                <img src="images/mitsu.png" alt="Mitsubishi" class="sponsor-logo">
+                <img src="images/lambo.png" alt="Lamborghini" class="sponsor-logo">
+                <img src="images/ferrari.jpg" alt="Ferrari" class="sponsor-logo">
+            </div>
+        </div>
+    </section>
+
+    
+    <div id="loginModal" class="modal">
+        <div class="modal-content login-modal-content">
+            <span class="close" onclick="closeLoginPopup()">&times;</span>
+            <h2 class="modal-title">Bergabung dengan Kami</h2>
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+                <button type="button" class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+            </div>
+            
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername">Username atau Email</label>
+                    <input type="text" id="loginUsername" required placeholder="Masukkan username atau email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Masukkan password">
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <p class="auth-switch">
+                    Belum punya akun? <a href="#" onclick="switchAuthTab('signup'); return false;">Daftar di sini</a>
+                </p>
+            </form>
+          
+            <form id="signupForm" class="auth-form" onsubmit="handleSignUp(event)">
+                <div class="form-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" required placeholder="Pilih username unik">
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required placeholder="Masukkan email Anda">
+                </div>
+                <div class="form-group">
+                    <label for="signupPhone">Nomor HP (Opsional)</label>
+                    <input type="tel" id="signupPhone" placeholder="08xxxxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required placeholder="Minimal 6 karakter">
+                </div>
+                <div class="form-group">
+                    <label for="signupPasswordConfirm">Konfirmasi Password</label>
+                    <input type="password" id="signupPasswordConfirm" required placeholder="Ulangi password">
+                </div>
+                <button type="submit" class="btn-primary">Sign Up</button>
+                <p class="auth-switch">
+                    Sudah punya akun? <a href="#" onclick="switchAuthTab('login'); return false;">Login di sini</a>
+                </p>
+            </form>
+        </div>
+    </div>
+    
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h3 class="modal-title">Ubah Booking</h3>
+            <form id="editBookingForm" onsubmit="handleEditSubmit(event)">
+                <input type="hidden" id="editBookingId">
+                <div class="form-group">
+                    <label>Pilih Layanan</label>
+                    <select id="editServiceSelect" required>
+                        <option value="">-- Pilih Layanan --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="editCustomerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Nomor HP</label>
+                    <input type="tel" id="editCustomerPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Service</label>
+                    <input type="date" id="editServiceDate" required>
+                </div>
+                <div id="editServiceInfo" class="service-info">
+                    <div><strong>Poin:</strong> <span id="editServicePoints">0</span> 🎁</div>
+                </div>
+               
+                <div id="editCustomServiceFields" class="custom-service-fields" style="display: none; margin-top: 0.8rem;">
+                    <div class="form-group">
+                        <label>Ketikan Layanan (jika tidak ada di daftar)</label>
+                        <input type="text" id="editCustomServiceName" placeholder="Contoh: Ganti Kampas Rem Custom">
+                    </div>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">Admin akan menentukan poin dan harga untuk layanan ini.</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Simpan</button>
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBookingModal()">&times;</span>
+            <h3 class="modal-title">Terima Kasih</h3>
+            <p>Silakan tunggu teknisi kami menghubungi anda untuk mengkonfirmasi pembayaran.</p>
+            <div style="text-align: center; margin-top: 1rem;">
+                <button class="btn-primary" onclick="closeBookingModal()">OK</button>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <footer class="footer">
+    <div class="container footer-grid">
+  
+        <div class="footer-col">
+            <h3>Bengkel Mobil Jaya</h3>
+            <p>
+                Layanan servis mobil terpercaya. Mulai dari service berkala, perbaikan mesin,
+                ganti oli, hingga layanan darurat. Kepuasan Anda adalah prioritas kami.
+            </p>
+        </div>
+        
+        <div class="footer-col">
+            <h4>Kontak Kami</h4>
+            <ul>
+                <li>📍 Bengkel Mobil Bandung, Jl. Pungkur No.173, Balonggede, Kec. Regol, Kota Bandung, Jawa Barat 40252</li>
+                <li>📞 0815-7266-5866 </li>
+                <li>✉ muhammadfachrim236@gmail.com</li>
+                <li>🕒 08.00 – 17.00 (Senin–Sabtu)</li>
+            </ul>
+        </div>
+    </div>
+</footer>
+    </footer>
+    <script src="bengkel.js"></script>
+</body>
+</html>
